@@ -1,0 +1,30 @@
+{
+  "name": "mern-notebook",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/server.js",
+  "scripts": {
+    "start": "node .",
+    "start-client": "npm start --prefix client",
+    "build": "tsc",
+    "build-client": "npm run build --prefix client",
+    "dev-client": "npm run dev --prefix client",
+    "dev-server": "concurrently -i -n \"tsc,node\" --default-input-target node \"tsc -w --preserveWatchOutput\"  \"nodemon . -w ./build\"",
+    "dev": "concurrently -i npm:dev-server npm:dev-client",
+    "prod": "concurrently npm:build npm:build-client"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/express": "^4.17.13",
+    "crypto-js": "^4.1.1",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1"
+  },
+  "devDependencies": {
+    "concurrently": "^6.2.1",
+    "nodemon": "^2.0.12"
+  }
+}
