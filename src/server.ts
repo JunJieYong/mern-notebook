@@ -1,10 +1,18 @@
+import { config } from 'dotenv';
+config();
+import { connectDB } from './config/db';
+connectDB();
 import express from 'express';
-import noteRoute from './routes/api/note';
-import userRoute from './routes/api/user';
-import auth from './authenticate';
+import logger from './utils/logger';
+import notesRouter from './routes/notes';
 
-const expressApp = express();
-expressApp.use(express.json());
+const app = express();
 
-expressApp.use('/api/user', userRoute);
-expressApp.use('/api/note', auth, noteRoute);
+app.use(express.json());
+
+app.use('/api/notes', notesRouter);
+
+const PORT = process.env.PORT || 5000;
+const server = app.listen(PORT, () =>
+  logger.info(`Server is running on port ${PORT}`)
+);

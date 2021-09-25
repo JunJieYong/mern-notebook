@@ -9,9 +9,10 @@
     "build": "tsc",
     "build-client": "npm run build --prefix client",
     "dev-client": "npm run dev --prefix client",
-    "dev-server": "concurrently -i -n \"tsc,node\" --default-input-target node \"tsc -w --preserveWatchOutput\"  \"nodemon . -w ./build\"",
+    "dev-server": "concurrently -i -n \"tsc,node\" --default-input-target node \"tsc -w --preserveWatchOutput\"  \"nodemon . -d 3 -w ./build\"",
     "dev": "concurrently -i npm:dev-server npm:dev-client",
-    "prod": "concurrently npm:build npm:build-client"
+    "prod": "concurrently npm:build npm:build-client",
+    "data:reset": "tsc && node build/dataSeeder"
   },
   "keywords": [],
   "author": "",
