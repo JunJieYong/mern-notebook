@@ -4,27 +4,28 @@ export interface Notes {
   title: string;
   content: string;
   author: string;
-  date: Date;
+  date: Date | string;
 }
 
 const notesSchema = new Schema<Notes>({
   title: {
     type: String,
-    required: true,
+    required: [true, 'Missing Title'],
   },
   content: {
     type: String,
-    required: true,
+    required: [true, 'Missing Content'],
   },
   author: {
     type: String,
-    required: true,
+    required: [true, 'Missing Author'],
   },
   date: {
     type: Date,
-    required: true,
+    required: [true, 'Missing Date'],
   },
 });
 
 export const NotesModel = model('notes', notesSchema);
+
 export default NotesModel;
