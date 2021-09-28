@@ -1,0 +1,30 @@
+.preview-note {
+  border: 1px solid whitesmoke;
+  display: flex;
+  position: relative;
+  flex-flow: column nowrap;
+  word-wrap: break-word;
+  min-height: 25rem;
+  border-radius: 10px;
+  background-color: var(--color-background);
+}
+
+.preview-title {
+  padding: 0.5rem 1rem;
+  font-weight: 1000;
+}
+
+.preview-content {
+  padding: 0 1rem;
+  overflow-y: hidden;
+}
+
+@media (min-width: 32rem) {
+  .wide-preview {
+    grid-column-end: span 2;
+  }
+
+  .tall-preview {
+    grid-row-end: span 2;
+  }
+}

@@ -1,0 +1,75 @@
+.topbar {
+  background-color: hsl(0, 0%, 20%);
+  display: block;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: var(--height-topbar);
+  margin: 0 0 20px 0;
+  min-width: 480px;
+  color: hsl(0, 0%, 90%);
+  --inner-height: calc(var(--height-topbar) - 16px);
+  z-index: 1;
+}
+
+.topbar-container {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  width: 100%;
+  padding: 8px;
+  flex: 1 0 auto;
+}
+
+.topleft {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  height: var(--inner-height);
+  flex: 1 1 auto;
+  overflow: hidden;
+  padding-right: 28px;
+}
+
+.menu {
+  font-size: xx-large;
+  background-color: inherit;
+}
+
+.logo {
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  color: var(--color-accent1);
+}
+
+.logo > svg {
+  font-size: xxx-large;
+  background-color: inherit;
+  margin-left:30px;
+}
+
+.logo > span {
+  font-size: x-large;
+  background-color: inherit; 
+  margin-left: 5px;
+}
+
+.topright {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  flex: 0 0 auto;
+  padding: 0 4px 0 0;
+  height: var(--inner-height);
+}
+
+.topright > svg {
+  font-size: xx-large;
+  background-color: inherit;
+  margin: 0 4px;
+}

@@ -1,0 +1,15 @@
+.redBorder {
+  border: 1px red solid;
+}
+
+.notes-grid {
+  display: grid;
+  gap: 2rem;
+
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  grid-auto-rows: 30rem;
+  justify-content: center;
+  margin-bottom: 30rem;
+}
+
+
