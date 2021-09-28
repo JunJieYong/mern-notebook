@@ -118,6 +118,3 @@ dist
 .pnp.*
 
 build
-
-# To be remove later
-client
