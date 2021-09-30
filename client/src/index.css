@@ -1,5 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans&family=Roboto:wght@500&display=swap');
 
+[contenteditable] {
+  outline: 0px solid transparent;
+}
+
+
 :root {
   --color-accent1: hsl(59, 100%, 65%);
   --color-background: hsl(0, 0%, 15%);

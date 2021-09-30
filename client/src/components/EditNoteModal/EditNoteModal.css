@@ -1,0 +1,63 @@
+.modal-background {
+  display: flex;
+  position: fixed;
+  z-index: 2;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.form-modal {
+  background-color: var(--color-background);
+  margin: auto;
+  border: 1px solid whitesmoke;
+  border-radius: 4px;
+  width: 60%;
+  max-height: 80vh;
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.edit-notes {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.edit-title {
+  font-size: xx-large;
+  font-weight: 800;
+  padding: 2px 5px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: whitesmoke;
+}
+
+.edit-content {
+  padding: 5px 5px;
+  background-color: var(--color-background);
+  color: whitesmoke;
+  outline: 0px solid transparent;
+  box-sizing: border-box;
+  max-height: 60vh;
+  overflow-y: scroll;
+}
+
+.edit-footer {
+  display: flex;
+  width: 100%;
+}
+
+.edit-footer .close {
+  margin: 5px auto 5px 10px;
+  cursor: pointer;
+}
+
+.edit-footer .delete {
+  text-transform: uppercase;
+  color: red;
+  background-color: rgba(100, 0, 0, 0.9);
+  margin: 5px 10px 5px auto;
+}
