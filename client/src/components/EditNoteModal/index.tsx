@@ -1,33 +1,30 @@
-import {
-  KeyboardEventHandler,
-  ReactElement,
-  useRef,
-} from 'react';
+import { KeyboardEventHandler, ReactElement, useRef } from 'react';
 import './EditNoteModal.css';
 import { Notes } from '../../../../src/models/notes';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { notesSelector, saveNoteChange } from '../../reducers/noteSlice';
 
-interface Props {
-  note: Notes;
-  index: number;
-  onSaveNote: (note: Notes, index: number) => void;
-}
-
-function EditNoteModal({note, index, onSaveNote }: Props): ReactElement {
+function EditNoteModal(): ReactElement {
+  const dispatch = useAppDispatch();
   const titleRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const { notes: allNotes, editingIndex } = useAppSelector(notesSelector);
+  if (editingIndex === undefined) return <div />;
+  const oldNote = allNotes[editingIndex];
+
   const processContent = (content: string) =>
     (content.length === 0 ? ' ' : content)
       .split('\n')
       .map((s, i) => <div key={i + 5}>{s}</div>);
 
-  const onCloseClick = () => {
+  const onSaveClick = () => {
     if (!titleRef.current || !contentRef.current) return;
-    const newNote: Notes = {
-      ...note,
+    const editedNote: Notes = {
+      ...oldNote,
       title: titleRef.current.innerText,
-      content: contentRef.current.innerText
+      content: contentRef.current.innerText,
     };
-    onSaveNote(newNote, index);
+    dispatch(saveNoteChange({ editedNote }));
   };
 
   const suppressLineBreak: KeyboardEventHandler = event => {
@@ -58,7 +55,7 @@ function EditNoteModal({note, index, onSaveNote }: Props): ReactElement {
             onKeyPress={suppressLineBreak}
             ref={titleRef}
           >
-            {note.title}
+            {oldNote.title}
           </div>
           <div
             className='edit-content'
@@ -66,11 +63,13 @@ function EditNoteModal({note, index, onSaveNote }: Props): ReactElement {
             ref={contentRef}
             suppressContentEditableWarning={true}
           >
-            {processContent(note.content)}
+            {processContent(oldNote.content)}
           </div>
         </div>
         <div className='edit-footer'>
-          <div className='close' onClick={onCloseClick}>Close</div>
+          <div className='close' onClick={onSaveClick}>
+            Save
+          </div>
         </div>
       </form>
     </div>

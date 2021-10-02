@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Notes } from '../../../src/models/notes';
+import { RootState } from '../app/store';
 
 export interface NotesState {
   editingIndex?: number;
@@ -85,5 +86,7 @@ export const {
   delete: deleteNote,
   discard: discardNoteChanges,
 } = noteSlice.actions;
+
+export const notesSelector = (state: RootState) => state.notes;
 
 export default noteSlice;
