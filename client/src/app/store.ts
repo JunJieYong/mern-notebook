@@ -1,7 +1,10 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
+import noteSlice from '../reducers/noteSlice';
 
 export const store = configureStore({
-  reducer: {},
+  reducer: {
+    notes: noteSlice.reducer,
+  },
 });
 
 export type AppDispatch = typeof store.dispatch;
