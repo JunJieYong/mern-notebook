@@ -2,5 +2,6 @@
   "files.exclude": {
     "**/node_modules": true
   },
-  "files.autoSave": "off"
+  "files.autoSave": "off",
+  "material-icon-theme.activeIconPack": "react_redux"
 }
