@@ -1,20 +1,21 @@
 import React, { MouseEventHandler, ReactElement } from 'react';
 import './PreviewNoteCard.css';
 import { Notes } from '../../../../src/models/notes';
+import { useAppDispatch } from '../../app/hooks';
+import { editNotes } from '../../reducers/noteSlice';
 
 interface Props {
   note: Notes;
   index: number;
-  onPreviewClick: (index: number) => void;
 }
 
-function PreviewNoteCard({ note, index, onPreviewClick }: Props): ReactElement {
-  const onClick: MouseEventHandler<HTMLDivElement> = (event) => {
-    onPreviewClick(index);
+function PreviewNoteCard({ note, index }: Props): ReactElement {
+  const dispatch = useAppDispatch();
+  const onClick: MouseEventHandler<HTMLDivElement> = event => {
+    dispatch(editNotes({ index }));
     event.preventDefault();
-  }
+  };
 
-  
   const processContent = (content: string) =>
     (content.length === 0 ? ' ' : content)
       .split('\n')
