@@ -1,9 +1,7 @@
-import { motion } from 'framer-motion';
-import './DeleteNoteModal.css';
-import React, { ReactElement } from 'react';
+import { ReactElement } from 'react';
 import Modal, { ModalProps } from '../Modal';
 import { useAppDispatch } from '../../app/hooks';
-import { cancelNoteState, confirmedDeleteNote, deleteNote } from '../../reducers/noteSlice';
+import { cancelNoteState, confirmedDeleteNote } from '../../reducers/noteSlice';
 
 function DeleteNoteModal(): ReactElement {
   const dispatch = useAppDispatch();
