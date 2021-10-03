@@ -11,9 +11,23 @@
   background-color: var(--color-background);
 }
 
-.preview-title {
+.preview-header {
+  display: flex;
+  align-content: center;
+  justify-content: space-between;
   padding: 0.5rem 1rem;
   font-weight: 900;
+}
+
+.preview-title {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.preview-header > .trash {
+  display: inline-block;
+  font-size: large;
+  cursor: pointer;
 }
 
 .preview-content {

@@ -4,8 +4,11 @@ import { RootState } from '../app/store';
 
 export interface NotesState {
   editingIndex?: number;
+  deletingIndex?: number;
   isEditing: boolean;
+  isDeleting: boolean;
   notes: Notes[];
+  triggerSave: boolean;
 }
 
 const name = 'notes';
@@ -13,6 +16,9 @@ const name = 'notes';
 const initialState: NotesState = {
   editingIndex: -1,
   isEditing: false,
+  deletingIndex: -1,
+  isDeleting: false,
+  triggerSave: false,
   notes: [
     {
       title: 'Hello World',
@@ -59,14 +65,18 @@ export const noteSlice = createSlice({
         state.editingIndex = action.payload.index;
       }
     },
-    save: (state, action: PayloadAction<{ editedNote: Notes }>) => {
-      if (state.isEditing && state.editingIndex !== undefined) {
-        if (state.editingIndex > -1)
-          state.notes[state.editingIndex] = action.payload.editedNote;
-        else state.notes.push(action.payload.editedNote);
+    save: (state, action: PayloadAction<{ editedNote?: Notes }>) => {
+      if (action.payload.editedNote) {
+        if (state.isEditing && state.editingIndex !== undefined) {
+          if (state.editingIndex > -1) state.notes[state.editingIndex] = action.payload.editedNote;
+          else state.notes.push(action.payload.editedNote);
 
-        state.isEditing = false;
-        state.editingIndex = undefined;
+          state.isEditing = false;
+          state.triggerSave = false;
+          state.editingIndex = undefined;
+        }
+      } else {
+        state.triggerSave = true;
       }
     },
     discard: state => {
@@ -74,17 +84,37 @@ export const noteSlice = createSlice({
       state.editingIndex = undefined;
     },
     delete: (state, action: PayloadAction<{ index: number }>) => {
-      state.notes.splice(action.payload.index);
+      state.isDeleting = true;
+      state.deletingIndex = action.payload.index;
+    },
+    confirmedDelete: state => {
+      if (state.isDeleting && state.deletingIndex !== undefined && state.deletingIndex > -1) {
+        state.isDeleting = false;
+        state.notes.splice(state.deletingIndex, 1);
+      }
+    },
+    cancelState: state => {
+      state.isDeleting = false;
+      state.isEditing = false;
     },
   },
 });
 
+export const createEmptyNote = (): Notes => ({
+  title: '',
+  content: '',
+  author: '',
+  date: '',
+});
+
 export const {
-  create: createNotes,
+  create: createNote,
   edit: editNotes,
   save: saveNoteChange,
   delete: deleteNote,
   discard: discardNoteChanges,
+  confirmedDelete: confirmedDeleteNote,
+  cancelState: cancelNoteState,
 } = noteSlice.actions;
 
 export const notesSelector = (state: RootState) => state.notes;

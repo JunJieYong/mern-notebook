@@ -1,8 +1,11 @@
-import { BiNote } from 'react-icons/bi';
+import { BiNote, BiPlusMedical } from 'react-icons/bi';
 import React, { ReactElement } from 'react';
 import './TopBar.css';
+import { useAppDispatch } from '../../app/hooks';
+import { createNote } from '../../reducers/noteSlice';
 
 function TopBar(): ReactElement {
+  const dispatch = useAppDispatch();
   return (
     <header className='topbar'>
       <div className='topbar-container'>
@@ -14,6 +17,7 @@ function TopBar(): ReactElement {
           </div>
         </div>
         <div className='topright'>
+          <BiPlusMedical onClick={e => dispatch(createNote())}/>
           {/* <BiSearchAlt/>
           <BiCog/> */}
         </div>
