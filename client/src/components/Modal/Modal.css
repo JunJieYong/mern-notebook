@@ -1,0 +1,47 @@
+.modal {
+  background-color: var(--color-background);
+  margin: auto;
+  opacity: 0;
+  margin-top: 0;
+  max-width: 10%;
+  max-height: 80vh;
+  border-radius: 4px;
+  overflow: clip;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.modal-title {
+  font-size: x-large;
+  font-weight: bolder;
+  text-transform: uppercase;
+  border-bottom: 1px grey solid;
+  /* padding: 5px; */
+}
+
+.modal-body {
+  margin: 5px 10px;
+}
+
+.modal-body > div:first-child {
+  margin-top: 10px;
+}
+
+.modal-body > div:last-child {
+  margin-bottom: 10px;
+}
+
+.modal-buttons {
+  margin: 0 10px 0 auto
+  
+  
+}
+
+.modal-buttons > button {
+  margin: auto 5px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  background-color: var(--color-accent2);
+}
