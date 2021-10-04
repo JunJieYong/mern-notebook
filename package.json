@@ -6,13 +6,16 @@
   "scripts": {
     "start": "node .",
     "start-client": "npm start --prefix client",
+    "build": "tsc",
     "build-client": "npm run build --prefix client",
     "dev-client": "npm run dev --prefix client",
     "dev-server": "concurrently -i -n \"tsc,node\" --default-input-target node \"tsc -w --preserveWatchOutput\"  \"nodemon . -d 3 -w ./build\"",
     "dev": "concurrently -i npm:dev-server npm:dev-client",
     "prod": "concurrently tsc npm:build-client",
     "data:reset": "tsc && node build/dataSeeder",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run prod && NPM_CONFIG_PRODUCTION=true"
+    "heroku-postinstall": "npm install --prefix client",
+    "heroku-build": "NPM_CONFIG_PRODUCTION=false npm run prod",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=true"
   },
   "keywords": [],
   "author": "",
