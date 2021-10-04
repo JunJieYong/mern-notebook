@@ -9,6 +9,8 @@
   min-height: 25rem;
   border-radius: 10px;
   background-color: var(--color-background);
+  
+  width: 12rem;
 }
 
 .preview-header {
