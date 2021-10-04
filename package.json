@@ -13,9 +13,8 @@
     "dev": "concurrently -i npm:dev-server npm:dev-client",
     "prod": "concurrently tsc npm:build-client",
     "data:reset": "tsc && node build/dataSeeder",
-    "heroku-postinstall": "npm install --prefix client",
-    "heroku-build": "NPM_CONFIG_PRODUCTION=false npm run prod",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=true"
+    "postinstall": "npm install --prefix client",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm run prod && NPM_CONFIG_PRODUCTION=true"
   },
   "keywords": [],
   "author": "",
