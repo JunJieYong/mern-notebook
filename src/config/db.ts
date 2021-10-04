@@ -11,7 +11,7 @@ export const connectDB = async () => {
     logger.verbose('MongoDB Connection Success');
   } catch (e) {
     logger.error('MongoDB Connection Fail');
-    outputToFile('logs/errors/mongoose.json', e);
+    await outputToFile('logs/errors/mongoose.json', e);
     process.exit();
   }
 };

@@ -22,8 +22,7 @@ export const notesData: Notes[] = [
   },
   {
     title: 'Fifth Note',
-    content:
-      'Esse reprehenderit elit exercitation enim aliquip pariatur deserunt laborum velit nisi labore proident.',
+    content: 'Esse reprehenderit elit exercitation enim aliquip pariatur deserunt laborum velit nisi labore proident.',
     author: 'System',
     date: new Date('10/09/2021'),
   },
