@@ -61,6 +61,7 @@ export const noteSlice = createSlice({
   reducers: {
     create: state => {
       if (!state.editingNote) {
+        state.status = NotesStatus.Editing;
         state.editingNote = createEmptyNote();
       }
     },
