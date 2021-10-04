@@ -1,19 +1,19 @@
-import React, { MouseEventHandler, ReactElement } from 'react';
+import { MouseEventHandler, ReactElement } from 'react';
 import './PreviewNoteCard.css';
-import { Notes } from '../../../../src/models/notes';
 import { useAppDispatch } from '../../app/hooks';
-import { deleteNote, editNotes } from '../../reducers/noteSlice';
+import { confirmDeleteNote, editNotes } from '../../slices/noteSlice';
 import { BiTrash } from 'react-icons/bi';
+import { IdedNotes } from '../../models/notes';
 
 interface Props {
-  note: Notes;
+  note: IdedNotes;
   index: number;
 }
 
-function PreviewNoteCard({ note, index }: Props): ReactElement {
+function PreviewNoteCard({ note }: Props): ReactElement {
   const dispatch = useAppDispatch();
   const onClick: MouseEventHandler<HTMLDivElement> = event => {
-    dispatch(editNotes({ index }));
+    dispatch(editNotes({ id: note._id }));
     event.preventDefault();
   };
 
@@ -27,7 +27,12 @@ function PreviewNoteCard({ note, index }: Props): ReactElement {
       <div className='preview-header'>
         <div className='preview-title'>{note.title}</div>
         <div className='trash' onClick={onTrashClick}>
-          <BiTrash onClick={(e) => {dispatch(deleteNote({index})); e.stopPropagation()}} />
+          <BiTrash
+            onClick={e => {
+              dispatch(confirmDeleteNote({ id: note._id }));
+              e.stopPropagation();
+            }}
+          />
         </div>
       </div>
       <div className='preview-content'>{processContent(note.content)}</div>

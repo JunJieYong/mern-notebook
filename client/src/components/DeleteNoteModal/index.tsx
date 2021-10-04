@@ -1,10 +1,11 @@
 import { ReactElement } from 'react';
 import Modal, { ModalProps } from '../Modal';
-import { useAppDispatch } from '../../app/hooks';
-import { cancelNoteState, confirmedDeleteNote } from '../../reducers/noteSlice';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { cancelNoteState, notesSelector, removeNote } from '../../slices/noteSlice';
 
 function DeleteNoteModal(): ReactElement {
   const dispatch = useAppDispatch();
+  const {deletingId} = useAppSelector(notesSelector)
   const props: ModalProps = {
     title: 'Delete Note',
     body: 'Are you sure you want to delete this note?',
@@ -13,7 +14,8 @@ function DeleteNoteModal(): ReactElement {
       minHeight: '10rem',
     },
     onPositiveButton: () => {
-      dispatch(confirmedDeleteNote());
+      if(deletingId)
+      dispatch(removeNote({_id: deletingId}));
     },
     onNegativeButton: () => {
         dispatch(cancelNoteState())

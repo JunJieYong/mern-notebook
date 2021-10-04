@@ -1,6 +1,6 @@
 import { AnimationProps, motion } from 'framer-motion';
 import './Modal.css';
-import React, { CSSProperties, HTMLProps, MouseEventHandler, ReactElement, useState } from 'react';
+import { CSSProperties, MouseEventHandler, ReactElement, useState } from 'react';
 import Popup from '../Popup';
 
 export interface ModalProps {

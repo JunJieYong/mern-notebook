@@ -1,20 +1,18 @@
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement, useEffect } from 'react';
 import './Home.css';
 import PreviewNoteCard from '../../components/PreviewNoteCard';
 import EditNoteModal from '../../components/EditNoteModal';
-import Popup from '../../components/Popup';
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { notesSelector, saveNoteChange } from '../../reducers/noteSlice';
+import {  useAppDispatch, useAppSelector } from '../../app/hooks';
+import { fetchNotes, notesSelector, NotesStatus } from '../../slices/noteSlice';
 import DeleteNoteModal from '../../components/DeleteNoteModal';
 
 function Home(): ReactElement {
-  const [showPopup, setShowPopup] = useState(false);
   const dispatch = useAppDispatch();
-  const { notes: allNotes, isEditing, isDeleting } = useAppSelector(notesSelector);
+  const { notes: allNotes, status } = useAppSelector(notesSelector);
 
   useEffect(() => {
-    setShowPopup(isEditing);
-  }, [showPopup, isEditing]);
+    dispatch(fetchNotes())
+  }, [dispatch])
 
   //TODO: Search
   return (
@@ -24,10 +22,8 @@ function Home(): ReactElement {
           <PreviewNoteCard {...{ key: index, note, index }} />
         ))}
       </div>
-      {isDeleting ? <DeleteNoteModal /> : <div />}
-      <Popup open={isEditing} onBackgroundClick={() => isEditing && dispatch(saveNoteChange({}))}>
-        {isEditing ? <EditNoteModal /> : <div />}
-      </Popup>
+      {status === NotesStatus.Editing ? <EditNoteModal /> : <div />}
+      {status === NotesStatus.Deleting ? <DeleteNoteModal /> : <div />}
     </div>
   );
 }

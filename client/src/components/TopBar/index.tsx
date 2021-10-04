@@ -2,7 +2,7 @@ import { BiNote, BiPlusMedical } from 'react-icons/bi';
 import React, { ReactElement } from 'react';
 import './TopBar.css';
 import { useAppDispatch } from '../../app/hooks';
-import { createNote } from '../../reducers/noteSlice';
+import { createNote } from '../../slices/noteSlice';
 
 function TopBar(): ReactElement {
   const dispatch = useAppDispatch();
