@@ -87,7 +87,8 @@ export const noteSlice = createSlice({
       .addCase(saveNote.pending, state => void (state.status = NotesStatus.Saving))
       .addCase(saveNote.fulfilled, (state, { payload: note }) => {
         const index = indexNoteById(state.notes, note._id);
-        state.notes.splice(index, 1, note);
+        if (index === -1) state.notes.push(note);
+        else state.notes.splice(index, 1, note);
         state.editingNote = undefined;
         state.status = NotesStatus.Idling;
       })
