@@ -77,30 +77,41 @@ export const noteSlice = createSlice({
       state.deletingId = action.payload.id;
     },
     cancelState: state => void (state.status = NotesStatus.Idling),
+    serverChange: (state, action: PayloadAction<IdedNotes>) => {
+      const index = indexNoteById(state.notes, action.payload._id);
+      if (index === -1) state.notes.push(action.payload);
+      else state.notes.splice(index, 1, action.payload);
+      state.editingNote = undefined;
+    },
+    serverDelete: (state, action: PayloadAction<{ _id: string }>) => {
+      const index = indexNoteById(state.notes, action.payload._id);
+      if (index !== -1) state.notes.splice(index, 1);
+      state.status = NotesStatus.Idling;
+    },
   },
   extraReducers: builder =>
     builder
       .addCase(fetchNotes.pending, state => void (state.status = NotesStatus.Fetching))
       .addCase(fetchNotes.fulfilled, (state, action) => void (state.notes = action.payload))
-      .addCase(fetchNotes.rejected, thunkRejectHandler)
+      .addCase(fetchNotes.rejected, thunkRejectHandler),
 
-      .addCase(saveNote.pending, state => void (state.status = NotesStatus.Saving))
-      .addCase(saveNote.fulfilled, (state, { payload: note }) => {
-        const index = indexNoteById(state.notes, note._id);
-        if (index === -1) state.notes.push(note);
-        else state.notes.splice(index, 1, note);
-        state.editingNote = undefined;
-        state.status = NotesStatus.Idling;
-      })
-      .addCase(saveNote.rejected, thunkRejectHandler)
+  // .addCase(saveNote.pending, state => void (state.status = NotesStatus.Saving))
+  // .addCase(saveNote.fulfilled, (state, { payload: note }) => {
+  //   const index = indexNoteById(state.notes, note._id);
+  //   if (index === -1) state.notes.push(note);
+  //   else state.notes.splice(index, 1, note);
+  //   state.editingNote = undefined;
+  //   state.status = NotesStatus.Idling;
+  // })
+  // .addCase(saveNote.rejected, thunkRejectHandler)
 
-      .addCase(removeNote.pending, state => void (state.status = NotesStatus.Deleting))
-      .addCase(removeNote.fulfilled, (state, { payload: note }) => {
-        const index = indexNoteById(state.notes, note._id);
-        state.notes.splice(index, 1);
-        state.status = NotesStatus.Idling;
-      })
-      .addCase(removeNote.rejected, thunkRejectHandler),
+  // .addCase(removeNote.pending, state => void (state.status = NotesStatus.Deleting))
+  // .addCase(removeNote.fulfilled, (state, { payload: note }) => {
+  //   const index = indexNoteById(state.notes, note._id);
+  //   if (index !== -1) state.notes.splice(index, 1);
+  //   state.status = NotesStatus.Idling;
+  // })
+  // .addCase(removeNote.rejected, thunkRejectHandler),
 });
 
 export const {
@@ -109,6 +120,8 @@ export const {
   confirmDelete: confirmDeleteNote,
   discard: discardNoteChanges,
   cancelState: cancelNoteState,
+  serverChange: serverNoteChange,
+  serverDelete: serverNoteDelete,
 } = noteSlice.actions;
 
 export const notesSelector = (state: RootState) => state.notes;
