@@ -4,8 +4,8 @@ export interface Notes {
   _id?: string;
   title: string;
   content: string;
-  author: string;
-  date: Date | string;
+  author?: string;
+  date?: Date | string;
 }
 
 const notesSchema = new Schema<Notes>({
@@ -16,14 +16,6 @@ const notesSchema = new Schema<Notes>({
   content: {
     type: String,
     required: [true, 'Missing Content'],
-  },
-  author: {
-    type: String,
-    required: [true, 'Missing Author'],
-  },
-  date: {
-    type: Date,
-    required: [true, 'Missing Date'],
   },
 });
 

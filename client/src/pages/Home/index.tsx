@@ -6,14 +6,16 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { fetchNotes, notesSelector, NotesStatus } from '../../slices/noteSlice';
 import DeleteNoteModal from '../../components/DeleteNoteModal';
 import { motion, Target, TargetAndTransition } from 'framer-motion';
+import { createNotesHandler } from '../../handlers/notesHandler';
 
 function Home(): ReactElement {
   const dispatch = useAppDispatch();
   const { notes: allNotes, status } = useAppSelector(notesSelector);
 
   useEffect(() => {
-    dispatch(fetchNotes());
-  }, [dispatch]);
+    dispatch(fetchNotes())
+    createNotesHandler();
+  }, [dispatch])
 
   const gridInital: Target = {
     display: 'flex',
