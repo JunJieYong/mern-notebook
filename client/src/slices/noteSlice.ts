@@ -81,6 +81,7 @@ export const noteSlice = createSlice({
       const index = indexNoteById(state.notes, action.payload._id);
       if (index === -1) state.notes.push(action.payload);
       else state.notes.splice(index, 1, action.payload);
+      state.editingNote = undefined;
     },
     serverDelete: (state, action: PayloadAction<{ _id: string }>) => {
       const index = indexNoteById(state.notes, action.payload._id);

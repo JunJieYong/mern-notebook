@@ -5,6 +5,7 @@ import EditNoteModal from '../../components/EditNoteModal';
 import {  useAppDispatch, useAppSelector } from '../../app/hooks';
 import { fetchNotes, notesSelector, NotesStatus } from '../../slices/noteSlice';
 import DeleteNoteModal from '../../components/DeleteNoteModal';
+import { createNotesHandler } from '../../handlers/notesHandler';
 
 function Home(): ReactElement {
   const dispatch = useAppDispatch();
@@ -12,6 +13,7 @@ function Home(): ReactElement {
 
   useEffect(() => {
     dispatch(fetchNotes())
+    createNotesHandler();
   }, [dispatch])
 
   //TODO: Search
