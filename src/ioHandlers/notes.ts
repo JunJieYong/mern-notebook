@@ -1,4 +1,5 @@
 import { Server, Socket } from 'socket.io';
+import { setFallbackEmit } from '../controllers/notes';
 import NotesModel, { Notes } from '../models/notes';
 
 interface NotesListenEvents {
@@ -13,4 +14,6 @@ export const registerNotesHandler = (io: Server, socket: Socket<NotesListenEvent
   socket.on('notes/save', note => NotesModel.findByIdAndUpdate(note._id).then(note => io.emit('notes/change', note)));
 
   socket.on('notes/delete', id => NotesModel.findByIdAndDelete(id).then(note => io.emit('notes/delete', note)));
+
+  setFallbackEmit((a, b) => io.emit(a, b));
 };
