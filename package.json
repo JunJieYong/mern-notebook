@@ -14,7 +14,8 @@
     "prod": "concurrently tsc npm:build-client",
     "data:reset": "tsc && node build/dataSeeder",
     "postinstall": "npm install --prefix client",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm run prod && NPM_CONFIG_PRODUCTION=true"
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm run prod && NPM_CONFIG_PRODUCTION=true",
+    "deploy": "git push heroku master"
   },
   "keywords": [],
   "author": "",
