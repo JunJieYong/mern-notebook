@@ -93,25 +93,25 @@ export const noteSlice = createSlice({
     builder
       .addCase(fetchNotes.pending, state => void (state.status = NotesStatus.Fetching))
       .addCase(fetchNotes.fulfilled, (state, action) => void (state.notes = action.payload))
-      .addCase(fetchNotes.rejected, thunkRejectHandler),
+      .addCase(fetchNotes.rejected, thunkRejectHandler)
 
-  // .addCase(saveNote.pending, state => void (state.status = NotesStatus.Saving))
-  // .addCase(saveNote.fulfilled, (state, { payload: note }) => {
-  //   const index = indexNoteById(state.notes, note._id);
-  //   if (index === -1) state.notes.push(note);
-  //   else state.notes.splice(index, 1, note);
-  //   state.editingNote = undefined;
-  //   state.status = NotesStatus.Idling;
-  // })
-  // .addCase(saveNote.rejected, thunkRejectHandler)
+      .addCase(saveNote.pending, state => void (state.status = NotesStatus.Saving))
+      .addCase(saveNote.fulfilled, (state, { payload: note }) => {
+        state.editingNote = undefined;
+        state.status = NotesStatus.Idling;
+        const index = indexNoteById(state.notes, note._id);
+        if (index === -1) state.notes.push(note);
+        else state.notes.splice(index, 1, note);
+      })
+      .addCase(saveNote.rejected, thunkRejectHandler)
 
-  // .addCase(removeNote.pending, state => void (state.status = NotesStatus.Deleting))
-  // .addCase(removeNote.fulfilled, (state, { payload: note }) => {
-  //   const index = indexNoteById(state.notes, note._id);
-  //   if (index !== -1) state.notes.splice(index, 1);
-  //   state.status = NotesStatus.Idling;
-  // })
-  // .addCase(removeNote.rejected, thunkRejectHandler),
+      .addCase(removeNote.pending, state => void (state.status = NotesStatus.Deleting))
+      .addCase(removeNote.fulfilled, (state, { payload: note }) => {
+        const index = indexNoteById(state.notes, note._id);
+        if (index !== -1) state.notes.splice(index, 1);
+        state.status = NotesStatus.Idling;
+      })
+      .addCase(removeNote.rejected, thunkRejectHandler),
 });
 
 export const {
