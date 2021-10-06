@@ -62,8 +62,8 @@ const local = {
 };
 
 if (useLocal) {
-  (window as any).resetData = () => {
-    localStorage.setItem('allNote', '[]');
+  (window as any).resetData = (purge = true) => {
+    if (purge) localStorage.setItem('allNote', '[]');
     notesData.forEach(local.createNote);
   };
   (window as any).localOps = local;

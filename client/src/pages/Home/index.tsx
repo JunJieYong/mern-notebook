@@ -7,6 +7,7 @@ import { fetchNotes, notesSelector, NotesStatus } from '../../slices/noteSlice';
 import DeleteNoteModal from '../../components/DeleteNoteModal';
 import { motion, Target, TargetAndTransition } from 'framer-motion';
 import { createNotesHandler } from '../../handlers/notesHandler';
+import PreviewGrid from '../../components/PreviewGrid';
 
 function Home(): ReactElement {
   const dispatch = useAppDispatch();
@@ -17,30 +18,30 @@ function Home(): ReactElement {
     createNotesHandler();
   }, [dispatch])
 
-  const gridInital: Target = {
-    display: 'flex',
-    flexFlow: 'row wrap'
-  }
-
-  const gridAnimate: TargetAndTransition  = {
-    
-  }
 
   //TODO: Search
+  // return (
+  //   <motion.div
+  //     layout 
+  //     initial={gridInital}
+  //     animate={gridAnimate}
+  //     className='notes-grid'
+  //   >
+  //     {allNotes.map((note, index) => (
+  //       <PreviewNoteCard {...{ key: index, note, index }} />
+  //     ))}
+  //     {status === NotesStatus.Editing ? <EditNoteModal /> : <div />}
+  //     {status === NotesStatus.Deleting ? <DeleteNoteModal /> : <div />}
+  //   </motion.div>
+  // );
+
   return (
-    <motion.div
-      layout 
-      initial={gridInital}
-      animate={gridAnimate}
-      className='notes-grid'
-    >
-      {allNotes.map((note, index) => (
-        <PreviewNoteCard {...{ key: index, note, index }} />
-      ))}
-      {status === NotesStatus.Editing ? <EditNoteModal /> : <div />}
-      {status === NotesStatus.Deleting ? <DeleteNoteModal /> : <div />}
-    </motion.div>
-  );
+    <div>
+      <br />
+      <div style={{position: 'relative'}}>All</div>
+      <PreviewGrid notes={allNotes} />
+    </div>
+  )
 }
 
 export default Home;

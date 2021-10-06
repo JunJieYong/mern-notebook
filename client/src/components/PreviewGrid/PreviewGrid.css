@@ -1,0 +1,16 @@
+.preview-grid {
+  /* display: flex; */
+  position: relative;
+  /* flex-flow: row wrap; */
+}
+
+.preview-card {
+  position: absolute;
+  display: flex;
+  border: 1px white solid;
+  border-radius: 3px;
+  flex-flow: column nowrap;
+  margin: 5px;
+  width: 240px;
+  padding: 5px;
+}
