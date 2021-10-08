@@ -22,6 +22,8 @@
     "react-icons": "^4.2.0",
     "react-redux": "^7.2.5",
     "react-scripts": "4.0.3",
+    "slate": "^0.66.5",
+    "slate-react": "^0.66.4",
     "socket.io-client": "^4.2.0",
     "typescript": "~4.1.5"
   },

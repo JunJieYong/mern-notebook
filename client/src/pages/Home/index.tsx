@@ -1,4 +1,4 @@
-import { ReactElement, useEffect } from 'react';
+import { ReactElement, useCallback, useEffect } from 'react';
 import './Home.css';
 import PreviewNoteCard from '../../components/PreviewNoteCard';
 import EditNoteModal from '../../components/EditNoteModal';
@@ -8,6 +8,8 @@ import DeleteNoteModal from '../../components/DeleteNoteModal';
 import { motion, Target, TargetAndTransition } from 'framer-motion';
 import { createNotesHandler } from '../../handlers/notesHandler';
 import PreviewGrid from '../../components/Preview/PreviewGrid';
+import PreviewCard from '../../components/Preview/PreviewCard';
+import Popup from '../../components/Popup';
 
 function Home(): ReactElement {
   const dispatch = useAppDispatch();
@@ -35,12 +37,26 @@ function Home(): ReactElement {
   //   </motion.div>
   // );
 
+  // return (
+  //   <div>
+  //     <br />
+  //     <div style={{position: 'relative'}}>All</div>
+  //     <PreviewGrid notes={allNotes} />
+  //   </div>
+  // )
+
+  const cb = useCallback( () => {}, [] )
+
   return (
-    <div>
-      <br />
-      <div style={{position: 'relative'}}>All</div>
-      <PreviewGrid notes={allNotes} />
-    </div>
+    <Popup open={true}>
+      <PreviewCard  
+        note={allNotes[0]}
+        initialY={0}
+        visible={true}
+        width={240}
+        heightCallback={cb}
+      />
+    </Popup>
   )
 }
 
