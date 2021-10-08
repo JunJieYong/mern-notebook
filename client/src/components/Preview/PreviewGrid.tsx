@@ -1,7 +1,8 @@
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
-import './PreviewGrid.css';
+import './Preview.css';
 import { IdedNotes } from '../../models/notes';
 import { motion } from 'framer-motion';
+import PreviewCard from './PreviewCard';
 
 const minimumWidth = 240;
 const minimumGap = 16;
@@ -15,24 +16,9 @@ interface ColumnData {
   gap: number;
 }
 
-interface CardPosition {
-  noteId: string;
-  x: number;
-  y: number;
-}
-
 interface CardHeight {
   noteId: string;
   height: number;
-}
-
-interface CardProps {
-  note: IdedNotes;
-  width: number;
-  visible: boolean;
-  initialY: number;
-  position?: Omit<CardPosition, 'noteId'>;
-  heightCallback: (noteId: string, height: number) => void;
 }
 
 let resizeDebounceId = -1;
@@ -122,34 +108,5 @@ function PreviewGrid({ notes }: GridProps): ReactElement {
   );
 }
 
-function PreviewCard({ note, heightCallback, width, initialY, visible, position }: CardProps): ReactElement<CardProps> {
-  const visibility = visible ? 'visible' : 'hidden';
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (ref.current) {
-      console.log(`Height Changed!!!`);
-      heightCallback(note._id, ref.current.offsetHeight);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ref.current?.offsetHeight, note]);
-
-  return (
-    <motion.div
-      ref={ref}
-      className='preview-card'
-      style={{ width, visibility }}
-      initial={{ y: initialY }}
-      animate={{ ...position }} //Use the animate property
-      transition={{
-        damping: 100,
-      }}
-    >
-      <div className='preview-header'>
-        <div className='preview-title'>{note.title}</div>
-      </div>
-      <div className='preview-content'>{note.content}</div>
-    </motion.div>
-  );
-}
 
 export default PreviewGrid;

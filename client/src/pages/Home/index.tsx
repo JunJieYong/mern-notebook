@@ -7,7 +7,7 @@ import { fetchNotes, notesSelector, NotesStatus } from '../../slices/noteSlice';
 import DeleteNoteModal from '../../components/DeleteNoteModal';
 import { motion, Target, TargetAndTransition } from 'framer-motion';
 import { createNotesHandler } from '../../handlers/notesHandler';
-import PreviewGrid from '../../components/PreviewGrid';
+import PreviewGrid from '../../components/Preview/PreviewGrid';
 
 function Home(): ReactElement {
   const dispatch = useAppDispatch();
