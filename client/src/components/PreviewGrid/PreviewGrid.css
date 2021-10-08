@@ -12,4 +12,6 @@
   flex-flow: column nowrap;
   padding: 5px; 
   visibility: hidden;
+  max-height: 300px;
+  overflow-y: hidden;
 }

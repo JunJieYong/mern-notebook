@@ -1,7 +1,7 @@
-import { ReactElement, useEffect, useRef, useState } from 'react';
+import { ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 import './PreviewGrid.css';
-import { IdedNotes, Notes } from '../../models/notes';
-import { motion, Target, TargetAndTransition } from 'framer-motion';
+import { IdedNotes } from '../../models/notes';
+import { motion } from 'framer-motion';
 
 const minimumWidth = 240;
 const minimumGap = 16;
@@ -21,37 +21,60 @@ interface CardPosition {
   y: number;
 }
 
-type HeightPromise = Promise<number>;
-type HeightCallback = (height: number) => void;
-
-interface CardResolver {
-  noteId: string;
-  resolver: HeightCallback;
-}
-
 interface CardHeight {
   noteId: string;
   height: number;
 }
 
 interface CardProps {
-  note: Notes;
+  note: IdedNotes;
   width: number;
   visible: boolean;
   initialY: number;
   position?: Omit<CardPosition, 'noteId'>;
-  heightCallback?: HeightCallback;
+  heightCallback: (noteId: string, height: number) => void;
 }
+
+let resizeDebounceId = -1;
+
+const debouncedHeights = {
+  timeoutId: -1,
+  heights: [] as CardHeight[],
+};
 
 function PreviewGrid({ notes }: GridProps): ReactElement {
   const [gridWidth, setGridWidth] = useState<number>();
   const [columnData, setColumnData] = useState<ColumnData>({ width: minimumWidth, gap: minimumGap, quantity: 1 });
-  const [cardResolvers, setCardResolvers] = useState<CardResolver[]>([]);
   const [cardsHeight, setCardsHeight] = useState<CardHeight[]>([]);
   const previewGrid = useRef<HTMLDivElement>(null);
 
+  const heightCallback = useCallback((noteId: string, height: number) => {
+    debouncedHeights.heights.push({ noteId, height });
+    if (debouncedHeights.timeoutId === -1) {
+      debouncedHeights.timeoutId = window.setTimeout(() => {
+        const cardHeights = [...cardsHeight];
+        const heights = [...debouncedHeights.heights];
+        debouncedHeights.timeoutId = -1;
+        heights.forEach(({ noteId, height }) => {
+          const index = cardHeights.findIndex(prev => noteId === prev.noteId);
+          if (index > -1) cardHeights[index].height = height;
+          else cardHeights.push({ noteId, height });
+        });
+        setCardsHeight(cardHeights);
+      }, 200);
+    }
+    
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setGridWidth]);
+
   useEffect(() => {
-    const resizeCallback = () => setGridWidth(previewGrid.current?.offsetWidth);
+    const resizeCallback = () => {
+      if (resizeDebounceId !== -1) clearTimeout(resizeDebounceId);
+      resizeDebounceId = window.setTimeout(() => {
+        resizeDebounceId = -1;
+        setGridWidth(previewGrid.current?.offsetWidth);
+      }, 200);
+    };
     window.addEventListener('resize', resizeCallback);
     resizeCallback();
     return () => window.removeEventListener('resize', resizeCallback);
@@ -67,40 +90,9 @@ function PreviewGrid({ notes }: GridProps): ReactElement {
     }
   }, [gridWidth]);
 
-  useEffect(() => {
-    const heightPromises: [string, Promise<number>][] = [];
-    const newResolvers = [...cardResolvers];
-    notes.forEach(note => {
-      let resolver: (h: number) => void = () => {};
-      const callbackIndex = newResolvers.findIndex(prev => prev.noteId === note._id);
-      const promise = new Promise<number>(resolve => (resolver = resolve));
-      heightPromises.push([note._id, promise]);
-
-      if (callbackIndex > -1) newResolvers[callbackIndex] = { noteId: note._id, resolver };
-      else newResolvers.push({ noteId: note._id, resolver });
-    });
-
-    setCardResolvers(newResolvers);
-
-    Promise.all(heightPromises.map(([noteId, promise]) => promise.then(height => ({ noteId, height })))).then(
-      heights => {
-        const newCardsHeight = [...cardsHeight];
-        heights.forEach(cur => {
-          const index = newCardsHeight.findIndex(prev => cur.noteId === prev.noteId);
-          if (index > -1) newCardsHeight[index].height = cur.height;
-          else newCardsHeight.push({ ...cur });
-        });
-        setCardsHeight(newCardsHeight);
-      },
-    );
-  }, [notes, columnData.width, columnData.quantity, columnData.gap]);
-
   const renderCards = () => {
     const colHeights = new Array(columnData.quantity).fill(0);
     const cards = notes.map((note, index) => {
-      const resolverIndex = cardResolvers.findIndex(({ noteId }) => noteId === note._id);
-      const resolver = resolverIndex > -1 ? cardResolvers[resolverIndex].resolver : undefined;
-
       const heightIndex = cardsHeight.findIndex(({ noteId }) => noteId === note._id);
       const height = heightIndex > -1 ? cardsHeight[heightIndex].height : 0;
       const lowestValueIndex = colHeights.reduce((lvi, v, i, a) => (v < a[lvi] ? i : lvi), 0);
@@ -115,7 +107,7 @@ function PreviewGrid({ notes }: GridProps): ReactElement {
           visible={!!height}
           position={{ x, y }}
           width={columnData.width}
-          heightCallback={resolver}
+          heightCallback={heightCallback}
         />
       );
     });
@@ -131,25 +123,23 @@ function PreviewGrid({ notes }: GridProps): ReactElement {
 }
 
 function PreviewCard({ note, heightCallback, width, initialY, visible, position }: CardProps): ReactElement<CardProps> {
-  const [animateProperty, setAnimateProperty] = useState<Target>();
   const visibility = visible ? 'visible' : 'hidden';
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (ref.current) {
-      if (heightCallback) {
-        console.log(`Height Changed!!!`);
-        heightCallback(ref.current.offsetHeight);
-      }
+      console.log(`Height Changed!!!`);
+      heightCallback(note._id, ref.current.offsetHeight);
     }
-  }, [ref.current, note, heightCallback]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ref.current?.offsetHeight, note]);
 
   return (
     <motion.div
       ref={ref}
       className='preview-card'
-      style={{ width }}
+      style={{ width, visibility }}
       initial={{ y: initialY }}
-      animate={{ ...position, visibility }} //Use the animate property
+      animate={{ ...position }} //Use the animate property
       transition={{
         damping: 100,
       }}
