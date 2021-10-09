@@ -60,13 +60,13 @@ export const noteSlice = createSlice({
   initialState,
   reducers: {
     create: state => {
-      if (!state.editingNote) {
+      if (state.status === NotesStatus.Idling) {
         state.status = NotesStatus.Editing;
         state.editingNote = createEmptyNote();
       }
     },
     edit: (state, action: PayloadAction<{ id: string }>) => {
-      if (!state.editingNote) {
+      if (state.status === NotesStatus.Idling) {
         state.status = NotesStatus.Editing;
         state.editingNote = getNoteById(state.notes, action.payload.id);
       }
