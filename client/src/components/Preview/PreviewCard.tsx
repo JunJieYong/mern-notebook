@@ -1,78 +1,101 @@
-import { ReactElement, useMemo, useState } from 'react';
-import { createEditor, Descendant, Editor, Element, Node, Transforms } from 'slate';
+import { MouseEventHandler, ReactElement, useEffect, useMemo, useRef, useState } from 'react';
+import { createEditor, Editor, Element, Node, Transforms } from 'slate';
 import { withHistory } from 'slate-history';
 import { Editable, RenderElementProps, RenderLeafProps, Slate, useSlate, withReact } from 'slate-react';
 import { IdedNotes } from '../../models/notes';
 import { withVerbose } from '../../utils/slate-utils';
 import './Preview.css';
 import { BiBold, BiItalic, BiUnderline } from 'react-icons/bi';
+import { motion, Variants } from 'framer-motion';
+
+export interface ModalLayout {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
 interface CardProps {
-  note?: IdedNotes;
+  note: IdedNotes;
   width: number;
   visible: boolean;
   initialY: number;
-  position?: {
+  gridPosition?: {
     x: number;
     y: number;
   };
+  modalLayout?: ModalLayout;
   heightCallback: (noteId: string, height: number) => void;
 }
 
-const initialValue: Descendant[] = [
-  {
-    type: 'title',
-    children: [{ text: 'Hello World' }],
-  },
-  {
-    type: 'paragraph',
-    children: [{ text: 'Testing ' }],
-  },
-  {
-    type: 'paragraph',
-    children: [{ text: 'Testing Bold', bold: true }],
-  },
-  {
-    type: 'paragraph',
-    children: [{ text: 'Testing Italic', italic: true }],
-  },
-  {
-    type: 'paragraph',
-    children: [{ text: 'Testing Underline', underline: true }],
-  },
-  {
-    type: 'paragraph',
-    children: [{ text: 'Testing Bold Italic', bold: true, italic: true }],
-  },
-  {
-    type: 'paragraph',
-    children: [{ text: 'Testing Bold Underline', bold: true, underline: true }],
-  },
-  {
-    type: 'paragraph',
-    children: [{ text: 'Testing Bold Underline', bold: true, underline: true }],
-  },
-  {
-    type: 'paragraph',
-    children: [{ text: 'Testing Italic Underline', italic: true, underline: true }],
-  },
-  {
-    type: 'paragraph',
-    children: [{ text: 'Testing Bold Italic Underline', bold: true, italic: true, underline: true }],
-  },
-];
-
-export function PreviewCard({ note, heightCallback, width, initialY, visible, position }: CardProps): ReactElement {
+// @refresh reset
+export function PreviewCard({
+  note,
+  heightCallback,
+  width,
+  initialY,
+  visible,
+  gridPosition,
+  modalLayout,
+}: CardProps): ReactElement {
+  const visibility = visible ? 'visible' : 'hidden';
+  const ref = useRef<HTMLDivElement>(null);
   const editor = useMemo(() => withVerbose(withMyPlugins(withHistory(withReact(createEditor())))), []);
-  // const renderElement = useCallback((props: RenderElementProps) =>  <Element {...props} />, []);
-  const [value, setValue] = useState(initialValue);
+  const [value, setValue] = useState(note?.descendant);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+
+  const onBackgroundClick: MouseEventHandler<HTMLDivElement> = e => {
+    console.log('Click Background');
+    setIsEditing(false);
+    e.stopPropagation();
+  };
+
+  const onPreviewClick: MouseEventHandler<HTMLDivElement> = e => {
+    console.log('Click Note');
+    if (!isEditing) {
+      setIsEditing(true);
+    }
+    e.stopPropagation();
+  };
+
+  useEffect(() => {
+    if (ref.current) {
+      console.log(`Height Changed!!!`);
+      heightCallback(note._id, ref.current.offsetHeight);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ref.current?.offsetHeight, note]);
+
+  const varients: Variants = {
+    initial: {
+      y: initialY,
+    },
+    grid: {
+      height: undefined,
+      ...gridPosition,
+    },
+    modal: {
+      ...modalLayout,
+    },
+  };
 
   return (
-    <div className='popup-content edit-modal'>
-      <Slate editor={editor} value={value} onChange={newValue => setValue(newValue)}>
-        <Editable className='editor' renderElement={renderElement} renderLeaf={renderLeaf} />
-        <Toolbar />
-      </Slate>
+    <div className={isEditing ? 'editor-background' : ''} onClick={onBackgroundClick}>
+      <motion.div
+        ref={ref}
+        className={isEditing ? 'popup-content edit-modal' : 'preview-card'}
+        variants={varients}
+        style={{ width, visibility }}
+        initial='initial'
+        animate={isEditing ? 'modal' : 'grid'}
+        transition={{ damping: 100 }}
+        onClick={onPreviewClick}
+      >
+        <Slate editor={editor} value={value} onChange={newValue => setValue(newValue)}>
+          <Editable className='editor' renderElement={renderElement} renderLeaf={renderLeaf} readOnly={!isEditing} />
+          {isEditing && <Toolbar />}
+        </Slate>
+      </motion.div>
     </div>
   );
 }
@@ -161,35 +184,3 @@ function Toolbar(): ReactElement {
 }
 
 export default PreviewCard;
-
-// export function PreviewCard({ note, heightCallback, width, initialY, visible, position }: CardProps): ReactElement {
-//   const visibility = visible ? 'visible' : 'hidden';
-//   const ref = useRef<HTMLDivElement>(null);
-//   useEffect(() => {
-//     if (ref.current) {
-//       console.log(`Height Changed!!!`);
-//       heightCallback(note._id, ref.current.offsetHeight);
-//     }
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [ref.current?.offsetHeight, note]);
-
-//   return (
-//     <motion.div
-//       ref={ref}
-//       className='preview-card'
-//       style={{ width, visibility }}
-//       initial={{ y: initialY }}
-//       animate={{ ...position }} //Use the animate property
-//       transition={{
-//         damping: 100,
-//       }}
-//     >
-//       <div className='preview-header'>
-//         <div className='preview-title'>{note.title}</div>
-//       </div>
-//       <div className='preview-content'>{note.content}</div>
-//     </motion.div>
-//   );
-// }
-
-// export default PreviewCard;
