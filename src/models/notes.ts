@@ -1,22 +1,19 @@
 import { Schema, model, Model, Document } from 'mongoose';
 
-export interface Notes {
+export type Notes = {
   _id?: string;
-  title: string;
-  content: string;
+  descendant: any[];
+  history?: any[];
   author?: string;
   date?: Date | string;
-}
+};
 
 const notesSchema = new Schema<Notes>({
-  title: {
-    type: String,
-    required: [true, 'Missing Title'],
-  },
-  content: {
-    type: String,
-    required: [true, 'Missing Content'],
-  },
+  _id: String,
+  descendant: [{}],
+  history: [{}],
+  author: String,
+  date: Date,
 });
 
 export const NotesModel = model('notes', notesSchema);
