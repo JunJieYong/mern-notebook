@@ -76,7 +76,7 @@ function PreviewGrid({ notes }: GridProps): ReactElement {
     }
   }, [gridWidth]);
 
-  const renderCards = () => {
+  const renderCards = useCallback(() => {
     const colHeights = new Array(columnData.quantity).fill(0);
     const cards = notes.map((note, index) => {
       const heightIndex = cardsHeight.findIndex(({ noteId }) => noteId === note._id);
@@ -99,7 +99,7 @@ function PreviewGrid({ notes }: GridProps): ReactElement {
     });
 
     return cards;
-  };
+  }, []);
 
   return (
     <motion.div ref={previewGrid} className='preview-grid'>
