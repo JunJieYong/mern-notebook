@@ -9,29 +9,54 @@ const notesAxios = axios.create({
 
 const notesData: Notes[] = [
   {
-    title: 'Hello World',
-    content: 'Aliqua quis occaecat amet culpa ex.',
+    descendant: [
+      {
+        type: 'title',
+        children: [{ text: 'First Note' }],
+      },
+      {
+        type: 'paragraph',
+        children: [{ text: 'Laboris anim duis duis consequat ea est dolore commodo commodo amet elit commodo dolor.' }],
+      },
+    ],
     author: 'System',
     date: new Date('09/26/2021'),
   },
   {
-    title: 'Second Note',
-    content:
-      'Consectetur enim magna duis laboris veniam. Nostrud fugiat nostrud tempor occaecat aliqua labore amet minim duis aliquip enim commodo eiusmod. Irure esse ut magna voluptate veniam ut amet eu veniam fugiat enim. Non Lorem occaecat labore ad excepteur id id nulla sint exercitation. Qui anim veniam do officia labore ad laboris amet esse esse enim deserunt officia. Dolore laborum deserunt elit ut. Laboris veniam reprehenderit Lorem laboris aliqua commodo.',
+    descendant: [
+      {
+        type: 'title',
+        children: [{ text: 'Second Note' }],
+      },
+      {
+        type: 'paragraph',
+        children: [
+          { text: 'Elit non commodo ipsum cupidatat pariatur cillum quis sunt.' },
+          { text: 'Deserunt deserunt anim aliqua ullamco.' },
+        ],
+      },
+    ],
     author: 'System',
     date: new Date('09/26/2021'),
   },
   {
-    title: 'Third Note',
-    content: 'Velit pariatur in dolor ipsum est nostrud in tempor.',
+    descendant: [
+      {
+        type: 'title',
+        children: [{ text: 'Third Note' }],
+      },
+      {
+        type: 'paragraph',
+        children: [
+          { text: 'Laboris anim duis duis consequat ea est dolore commodo commodo amet elit commodo dolor.' },
+          { text: 'Ut officia velit aute est nulla dolor.', bold: true },
+          { text: 'Ut enim occaecat nulla tempor.', italic: true },
+          { text: 'Velit qui ut eiusmod pariatur enim ut ex pariatur culpa.', underline: true },
+        ],
+      },
+    ],
     author: 'System',
     date: new Date('09/30/2021'),
-  },
-  {
-    title: 'Fifth Note',
-    content: 'Esse reprehenderit elit exercitation enim aliquip pariatur deserunt laborum velit nisi labore proident.',
-    author: 'System',
-    date: new Date('10/09/2021'),
   },
 ];
 

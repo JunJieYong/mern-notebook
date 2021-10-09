@@ -27,8 +27,7 @@ export const indexNoteById = (notes: IdedNotes[], id: string) => notes.findIndex
 export const getNoteById = (notes: IdedNotes[], id: string) => notes.find(({ _id }) => _id === id);
 export const createEmptyNote = (): IdedNotes => ({
   _id: newNoteTempId,
-  title: '',
-  content: '',
+  descendant: [{ type: 'title', children: [{ text: '' }] }],
   author: '',
   date: '',
 });

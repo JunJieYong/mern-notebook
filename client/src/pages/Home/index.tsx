@@ -1,11 +1,7 @@
 import { ReactElement, useCallback, useEffect } from 'react';
 import './Home.css';
-import PreviewNoteCard from '../../components/PreviewNoteCard';
-import EditNoteModal from '../../components/EditNoteModal';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { fetchNotes, notesSelector, NotesStatus } from '../../slices/noteSlice';
-import DeleteNoteModal from '../../components/DeleteNoteModal';
-import { motion, Target, TargetAndTransition } from 'framer-motion';
+import { fetchNotes, notesSelector } from '../../slices/noteSlice';
 import { createNotesHandler } from '../../handlers/notesHandler';
 import PreviewGrid from '../../components/Preview/PreviewGrid';
 import PreviewCard from '../../components/Preview/PreviewCard';

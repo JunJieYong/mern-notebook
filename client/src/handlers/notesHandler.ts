@@ -19,13 +19,14 @@ export const createNotesHandler = () => {
 
 (window as any).timedCreate = (ms = 5000) =>
   ((window as any).intervalId = setInterval(() => {
-    store.dispatch(
-      serverNoteChange({
-        _id: uuid(),
-        title: 'Second Note',
-        content: 'Consectetur enim magna duis laboris veniam.',
-        author: 'System',
-        date: '09/26/2021',
-      }),
-    );
+    // !Deprecated
+    // store.dispatch(
+    //   serverNoteChange({
+    //     _id: uuid(),
+    //     title: 'Second Note',
+    //     content: 'Consectetur enim magna duis laboris veniam.',
+    //     author: 'System',
+    //     date: '09/26/2021',
+    //   }),
+    // );
   }, ms));
