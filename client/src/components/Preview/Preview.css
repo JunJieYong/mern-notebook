@@ -29,6 +29,20 @@
   background-color: rgba(0, 0, 0, 0.4);
 }
 
+.trash { 
+  position: absolute;
+  inset: 7px 7px auto auto;
+  background-color: var(--color-background);
+  z-index: 1;
+  cursor: pointer;
+  font-size: x-large;
+}
+
+.editor-title {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 .edit-modal {
   display: flex;
   flex-flow: column nowrap;

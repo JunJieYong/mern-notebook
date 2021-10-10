@@ -43,7 +43,7 @@ export const fetchNotes = createAsyncThunk(`${name}/fetchNotes`, () => getAllNot
 export const saveNote = createAsyncThunk(`${name}/saveNewNote`, async (note: IdedNotes) =>
   note._id === newNoteTempId ? addNote({ ...note, _id: undefined }) : updateNote(note._id, note),
 );
-export const removeNote = createAsyncThunk(`${name}/`, ({ _id }: { _id: string }) => deleteNote(_id));
+export const removeNote = createAsyncThunk(`${name}/removeNote`, ({ _id }: { _id: string }) => deleteNote(_id));
 
 type PossibleRejection = typeof fetchNotes.rejected | typeof saveNote.rejected | typeof removeNote.rejected;
 //Slice
@@ -93,7 +93,10 @@ export const noteSlice = createSlice({
     serverDelete: (state, action: PayloadAction<{ _id: string }>) => {
       const index = indexNoteById(state.notes, action.payload._id);
       if (index !== -1) {
-        if (state.editingId === action.payload._id) state.status = NotesStatus.Idling;
+        if (state.deletingId === action.payload._id) {
+          state.deletingId = undefined;
+          state.status = NotesStatus.Idling;
+        }
         state.notes.splice(index, 1);
       }
     },
@@ -119,7 +122,11 @@ export const noteSlice = createSlice({
       .addCase(removeNote.pending, state => void (state.status = NotesStatus.Deleting))
       .addCase(removeNote.fulfilled, (state, { payload: note }) => {
         const index = indexNoteById(state.notes, note._id);
-        if (index !== -1) state.notes.splice(index, 1);
+        if (index !== -1) {
+          state.deletingId = undefined;
+          state.status = NotesStatus.Idling;
+          state.notes.splice(index, 1);
+        }
         state.status = NotesStatus.Idling;
       })
       .addCase(removeNote.rejected, thunkRejectHandler),
