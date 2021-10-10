@@ -1,6 +1,6 @@
 import { MouseEventHandler, ReactElement, useEffect, useMemo, useRef, useState } from 'react';
 import { createEditor, Editor, Element, Node, Transforms, Text } from 'slate';
-import { withHistory } from 'slate-history';
+import { History, withHistory } from 'slate-history';
 import { Editable, RenderElementProps, RenderLeafProps, Slate, useSlate, withReact } from 'slate-react';
 import { IdedNotes } from '../../models/notes';
 import { withVerbose } from '../../utils/slate-utils';
@@ -43,7 +43,10 @@ export function PreviewCard({
   const dispatch = useAppDispatch();
   const visibility = visible ? 'visible' : 'hidden';
   const ref = useRef<HTMLDivElement>(null);
-  const editor = useMemo(() => withMyPlugins(withHistory(withReact(createEditor()))), []);
+  const editor = useMemo(() => {
+    const editor = withVerbose(withMyPlugins(withHistory(withReact(createEditor()))));
+    return editor;
+  }, []);
   const [noteValue, setNoteValue] = useState(note?.descendant);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const { editingId, status } = useAppSelector(notesSelector);
@@ -59,7 +62,7 @@ export function PreviewCard({
       saveNote({
         _id: note._id,
         descendant: noteValue,
-        history: editor.history
+        history: editor.history,
       }),
     );
     e.stopPropagation();
