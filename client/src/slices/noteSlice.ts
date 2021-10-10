@@ -15,7 +15,7 @@ export enum NotesStatus {
 
 export interface NotesState {
   status: NotesStatus;
-  editingNote?: IdedNotes;
+  editingId?: string;
   deletingId?: string;
   notes: IdedNotes[];
   errors?: any;
@@ -40,7 +40,7 @@ const initialState: NotesState = {
 //Thunks
 export const fetchNotes = createAsyncThunk(`${name}/fetchNotes`, () => getAllNotes());
 // export const  = createAsyncThunk(`${name}/${}`, getNotesById)
-export const saveNote = createAsyncThunk(`${name}/saveNewNote`, async ({ note }: { note: IdedNotes }) =>
+export const saveNote = createAsyncThunk(`${name}/saveNewNote`, async (note: IdedNotes) =>
   note._id === newNoteTempId ? addNote({ ...note, _id: undefined }) : updateNote(note._id, note),
 );
 export const removeNote = createAsyncThunk(`${name}/`, ({ _id }: { _id: string }) => deleteNote(_id));
@@ -51,6 +51,7 @@ const thunkRejectHandler: CaseReducer<NotesState, ReturnType<PossibleRejection>>
   state.status = NotesStatus.Errored;
   const error = action.error;
   if (axios.isAxiosError(error)) {
+    alert('Error');
   }
 };
 
@@ -59,44 +60,55 @@ export const noteSlice = createSlice({
   initialState,
   reducers: {
     create: state => {
-      if (!state.editingNote) {
+      if (state.status === NotesStatus.Idling) {
         state.status = NotesStatus.Editing;
-        state.editingNote = createEmptyNote();
+        state.editingId = newNoteTempId;
+        state.notes.push(createEmptyNote());
       }
     },
-    edit: (state, action: PayloadAction<{ id: string }>) => {
-      if (!state.editingNote) {
+    edit: (state, action: PayloadAction<{ _id: string }>) => {
+      if (state.status === NotesStatus.Idling) {
         state.status = NotesStatus.Editing;
-        state.editingNote = getNoteById(state.notes, action.payload.id);
+        state.editingId = action.payload._id;
       }
     },
     discard: state => void (state.status = NotesStatus.Idling),
     confirmDelete: (state, action: PayloadAction<{ id: string }>) => {
-      state.status = NotesStatus.Deleting;
-      state.deletingId = action.payload.id;
+      if (state.status === NotesStatus.Idling) {
+        state.status = NotesStatus.Deleting;
+        state.deletingId = action.payload.id;
+      }
     },
     cancelState: state => void (state.status = NotesStatus.Idling),
+    clearNew: state => void (state.notes = state.notes.filter(note => note._id != newNoteTempId)),
     serverChange: (state, action: PayloadAction<IdedNotes>) => {
       const index = indexNoteById(state.notes, action.payload._id);
-      if (index === -1) state.notes.push(action.payload);
-      else state.notes.splice(index, 1, action.payload);
-      state.editingNote = undefined;
+      if (index === -1) {
+        state.notes.push(action.payload);
+      } else {
+        if (state.editingId === action.payload._id) state.status = NotesStatus.Idling;
+        state.notes.splice(index, 1, action.payload);
+      }
     },
     serverDelete: (state, action: PayloadAction<{ _id: string }>) => {
       const index = indexNoteById(state.notes, action.payload._id);
-      if (index !== -1) state.notes.splice(index, 1);
-      state.status = NotesStatus.Idling;
+      if (index !== -1) {
+        if (state.editingId === action.payload._id) state.status = NotesStatus.Idling;
+        state.notes.splice(index, 1);
+      }
     },
   },
   extraReducers: builder =>
     builder
       .addCase(fetchNotes.pending, state => void (state.status = NotesStatus.Fetching))
-      .addCase(fetchNotes.fulfilled, (state, action) => void (state.notes = action.payload))
+      .addCase(fetchNotes.fulfilled, (state, action) => {
+        state.status = NotesStatus.Idling;
+        state.notes = action.payload;
+      })
       .addCase(fetchNotes.rejected, thunkRejectHandler)
 
       .addCase(saveNote.pending, state => void (state.status = NotesStatus.Saving))
       .addCase(saveNote.fulfilled, (state, { payload: note }) => {
-        state.editingNote = undefined;
         state.status = NotesStatus.Idling;
         const index = indexNoteById(state.notes, note._id);
         if (index === -1) state.notes.push(note);
@@ -121,6 +133,7 @@ export const {
   cancelState: cancelNoteState,
   serverChange: serverNoteChange,
   serverDelete: serverNoteDelete,
+  clearNew: clearNewNote,
 } = noteSlice.actions;
 
 export const notesSelector = (state: RootState) => state.notes;

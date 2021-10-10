@@ -3,6 +3,8 @@ import './Preview.css';
 import { IdedNotes } from '../../models/notes';
 import { motion } from 'framer-motion';
 import PreviewCard, { ModalLayout } from './PreviewCard';
+import { clearNewNote, newNoteTempId, notesSelector, NotesStatus } from '../../slices/noteSlice';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
 
 const minimumWidth = 240;
 const minimumGap = 16;
@@ -29,12 +31,19 @@ const debouncedHeights = {
 };
 
 function PreviewGrid({ notes }: GridProps): ReactElement {
+  const dispatch = useAppDispatch();
   const [modalLayout, setModalLayout] = useState<ModalLayout>();
   const [gridWidth, setGridWidth] = useState<number>();
   const [columnData, setColumnData] = useState<ColumnData>({ width: minimumWidth, gap: minimumGap, quantity: 1 });
   const [cardsHeight, setCardsHeight] = useState<CardHeight[]>([]);
   const previewGrid = useRef<HTMLDivElement>(null);
+  const { editingId, status } = useAppSelector(notesSelector);
 
+  useEffect(() => {
+    if(status !== NotesStatus.Editing){
+      dispatch(clearNewNote())
+    }
+  }, [status])
 
   const heightCallback = useCallback(
     (noteId: string, height: number) => {
@@ -63,10 +72,12 @@ function PreviewGrid({ notes }: GridProps): ReactElement {
       resizeDebounceId = window.setTimeout(() => {
         resizeDebounceId = -1;
         setGridWidth(previewGrid.current?.offsetWidth);
-        const {innerWidth: sWidth, innerHeight: sHeight} = window;
-        const width = sWidth * 0.6, height = sHeight * 0.6;
-        const x = sWidth * 0.2, y = sHeight * 0.2;
-        setModalLayout({x, y, width, height});
+        const { innerWidth: sWidth, innerHeight: sHeight } = window;
+        const width = sWidth * 0.6,
+          height = sHeight * 0.6;
+        const x = sWidth * 0.2,
+          y = sHeight * 0.2;
+        setModalLayout({ x, y, width, height });
       }, 200);
     };
     window.addEventListener('resize', resizeCallback);
@@ -86,37 +97,38 @@ function PreviewGrid({ notes }: GridProps): ReactElement {
 
   const renderCards = () => {
     const colHeights = new Array(columnData.quantity).fill(0);
-    const cards = notes.map((note, index) => {
-      console.log('\tRendering Card');
-      const heightIndex = cardsHeight.findIndex(({ noteId }) => noteId === note._id);
-      const height = heightIndex > -1 ? cardsHeight[heightIndex].height : 0;
-      const lowestValueIndex = colHeights.reduce((lvi, v, i, a) => (v < a[lvi] ? i : lvi), 0);
-      const x = lowestValueIndex * (columnData.width + columnData.gap);
-      const y = colHeights[lowestValueIndex];
-      colHeights[lowestValueIndex] += height + 16;
-      return (
-        <PreviewCard
-          key={index}
-          note={note}
-          initialY={y}
-          visible={!!height}
-          gridPosition={{ x, y }}
-          modalLayout={modalLayout}
-          width={columnData.width}
-          heightCallback={heightCallback}
-        />
-      );
-    });
+    const cards = notes
+      .filter(({ _id }) => _id !== newNoteTempId || (editingId === newNoteTempId && status === NotesStatus.Editing))
+      .map((note, index) => {
+        console.log('\tRendering Card');
+        const heightIndex = cardsHeight.findIndex(({ noteId }) => noteId === note._id);
+        const height = heightIndex > -1 ? cardsHeight[heightIndex].height : 0;
+        const lowestValueIndex = colHeights.reduce((lvi, v, i, a) => (v < a[lvi] ? i : lvi), 0);
+        const x = lowestValueIndex * (columnData.width + columnData.gap);
+        const y = colHeights[lowestValueIndex];
+        colHeights[lowestValueIndex] += height + 16;
+        return (
+          <PreviewCard
+            key={index}
+            note={note}
+            initialY={y}
+            visible={!!height}
+            gridPosition={{ x, y }}
+            modalLayout={modalLayout}
+            width={columnData.width}
+            heightCallback={heightCallback}
+          />
+        );
+      });
 
-    if (previewGrid.current) 
-      previewGrid.current.style.height = `${Math.max(...colHeights) + 100}px`
+    if (previewGrid.current) previewGrid.current.style.height = `${Math.max(...colHeights) + 100}px`;
     return cards;
   };
 
   return (
-      <motion.div ref={previewGrid} className='preview-grid'>
-        {renderCards()}
-      </motion.div>
+    <motion.div ref={previewGrid} className='preview-grid'>
+      {renderCards()}
+    </motion.div>
   );
 }
 

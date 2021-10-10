@@ -3,15 +3,17 @@ import { Schema, model, Model, Document } from 'mongoose';
 export type Notes = {
   _id?: string;
   descendant: any[];
-  history?: any[];
+  history?: {
+    redos: any[][];
+    undos: any[][];
+  };
   author?: string;
   date?: Date | string;
 };
 
 const notesSchema = new Schema<Notes>({
-  _id: String,
   descendant: [{}],
-  history: [{}],
+  history: Object,
   author: String,
   date: Date,
 });

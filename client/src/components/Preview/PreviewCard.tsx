@@ -7,6 +7,8 @@ import { withVerbose } from '../../utils/slate-utils';
 import './Preview.css';
 import { BiBold, BiItalic, BiUnderline } from 'react-icons/bi';
 import { motion, Variants } from 'framer-motion';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { editNotes, notesSelector, NotesStatus, saveNote } from '../../slices/noteSlice';
 
 export interface ModalLayout {
   x: number;
@@ -38,22 +40,35 @@ export function PreviewCard({
   gridPosition,
   modalLayout,
 }: CardProps): ReactElement {
+  const dispatch = useAppDispatch();
   const visibility = visible ? 'visible' : 'hidden';
   const ref = useRef<HTMLDivElement>(null);
   const editor = useMemo(() => withMyPlugins(withHistory(withReact(createEditor()))), []);
-  const [value, setValue] = useState(note?.descendant);
+  const [noteValue, setNoteValue] = useState(note?.descendant);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const { editingId, status } = useAppSelector(notesSelector);
+
+  useEffect(() => {
+    if (status === NotesStatus.Editing && (editingId === note._id || note._id === 'new')) setIsEditing(true);
+    else setIsEditing(false);
+  }, [status, editingId]);
 
   const onBackgroundClick: MouseEventHandler<HTMLDivElement> = e => {
     console.log('Click Background');
-    setIsEditing(false);
+    dispatch(
+      saveNote({
+        _id: note._id,
+        descendant: noteValue,
+        history: editor.history
+      }),
+    );
     e.stopPropagation();
   };
 
   const onPreviewClick: MouseEventHandler<HTMLDivElement> = e => {
     console.log('Click Note');
     if (!isEditing) {
-      setIsEditing(true);
+      dispatch(editNotes(note));
     }
     e.stopPropagation();
   };
@@ -91,7 +106,7 @@ export function PreviewCard({
         transition={{ damping: 100 }}
         onClick={onPreviewClick}
       >
-        <Slate editor={editor} value={value} onChange={newValue => setValue(newValue)}>
+        <Slate editor={editor} value={noteValue} onChange={newValue => setNoteValue(newValue)}>
           <Editable className='editor' renderElement={renderElement} renderLeaf={renderLeaf} readOnly={!isEditing} />
           {isEditing && <Toolbar />}
         </Slate>

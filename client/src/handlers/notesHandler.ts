@@ -8,11 +8,11 @@ import { serverNoteChange, serverNoteDelete } from '../slices/noteSlice';
 export const createNotesHandler = () => {
   if (!useLocal) {
     socket.on('notes/change', (note: IdedNotes) => {
-      store.dispatch(serverNoteChange(note));
+      if (note) store.dispatch(serverNoteChange(note));
     });
 
     socket.on('notes/delete', (note: IdedNotes) => {
-      store.dispatch(serverNoteDelete(note));
+      if (note) store.dispatch(serverNoteDelete(note));
     });
   }
 };
