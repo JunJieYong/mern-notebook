@@ -1,31 +1,26 @@
-import { ReactElement, useEffect } from 'react';
+import { ReactElement, useCallback, useEffect } from 'react';
 import './Home.css';
-import PreviewNoteCard from '../../components/PreviewNoteCard';
-import EditNoteModal from '../../components/EditNoteModal';
-import {  useAppDispatch, useAppSelector } from '../../app/hooks';
-import { fetchNotes, notesSelector, NotesStatus } from '../../slices/noteSlice';
-import DeleteNoteModal from '../../components/DeleteNoteModal';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { fetchNotes, notesSelector } from '../../slices/noteSlice';
 import { createNotesHandler } from '../../handlers/notesHandler';
+import PreviewGrid from '../../components/Preview/PreviewGrid';
 
 function Home(): ReactElement {
   const dispatch = useAppDispatch();
   const { notes: allNotes, status } = useAppSelector(notesSelector);
 
   useEffect(() => {
-    dispatch(fetchNotes())
+    dispatch(fetchNotes());
     createNotesHandler();
-  }, [dispatch])
+  }, [dispatch]);
 
   //TODO: Search
+
   return (
-    <div className=''>
-      <div className='notes-grid'>
-        {allNotes.map((note, index) => (
-          <PreviewNoteCard {...{ key: index, note, index }} />
-        ))}
-      </div>
-      {status === NotesStatus.Editing ? <EditNoteModal /> : <div />}
-      {status === NotesStatus.Deleting ? <DeleteNoteModal /> : <div />}
+    <div>
+      <br />
+      <div style={{ position: 'relative' }}>All</div>
+      <PreviewGrid notes={allNotes} />
     </div>
   );
 }

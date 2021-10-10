@@ -22,6 +22,9 @@
     "react-icons": "^4.2.0",
     "react-redux": "^7.2.5",
     "react-scripts": "4.0.3",
+    "slate": "^0.66.5",
+    "slate-history": "^0.66.0",
+    "slate-react": "^0.66.4",
     "socket.io-client": "^4.2.0",
     "typescript": "~4.1.5"
   },
@@ -46,6 +49,7 @@
     ]
   },
   "devDependencies": {
-    "serve": "^12.0.1"
+    "serve": "^12.0.1",
+    "uuid": "^8.3.2"
   }
 }

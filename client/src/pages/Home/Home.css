@@ -2,7 +2,7 @@
   border: 1px red solid;
 }
 
-.notes-grid {
+/* .notes-grid {
   display: grid;
   gap: 2rem;
 
@@ -10,4 +10,4 @@
   grid-auto-rows: 30rem;
   justify-content: center;
   margin-bottom: 30rem;
-}
+} */
