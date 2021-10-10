@@ -59,7 +59,7 @@ export function withVerbose(editor: Editor): Editor {
   editor.apply = (...args) => {
     console.log(`apply`, ...args);
     (window as any).verboseArgs = args;
-    debugger;
+    // debugger;
     return apply(...args);
   };
 

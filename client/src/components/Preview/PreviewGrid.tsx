@@ -40,10 +40,10 @@ function PreviewGrid({ notes }: GridProps): ReactElement {
   const { editingId, status } = useAppSelector(notesSelector);
 
   useEffect(() => {
-    if(status !== NotesStatus.Editing){
-      dispatch(clearNewNote())
+    if (status !== NotesStatus.Editing) {
+      dispatch(clearNewNote());
     }
-  }, [status])
+  }, [dispatch, status]);
 
   const heightCallback = useCallback(
     (noteId: string, height: number) => {
@@ -61,9 +61,9 @@ function PreviewGrid({ notes }: GridProps): ReactElement {
           setCardsHeight(cardHeights);
         }, 200);
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
-    [setGridWidth],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [setGridWidth, notes.map(({_id}) => _id).join()]
   );
 
   useEffect(() => {
@@ -99,7 +99,7 @@ function PreviewGrid({ notes }: GridProps): ReactElement {
     const colHeights = new Array(columnData.quantity).fill(0);
     const cards = notes
       .filter(({ _id }) => _id !== newNoteTempId || (editingId === newNoteTempId && status === NotesStatus.Editing))
-      .map((note, index) => {
+      .map((note) => {
         console.log('\tRendering Card');
         const heightIndex = cardsHeight.findIndex(({ noteId }) => noteId === note._id);
         const height = heightIndex > -1 ? cardsHeight[heightIndex].height : 0;
@@ -109,7 +109,7 @@ function PreviewGrid({ notes }: GridProps): ReactElement {
         colHeights[lowestValueIndex] += height + 16;
         return (
           <PreviewCard
-            key={index}
+            key={note._id}
             note={note}
             initialY={y}
             visible={!!height}

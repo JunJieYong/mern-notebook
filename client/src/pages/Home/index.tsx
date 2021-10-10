@@ -1,9 +1,10 @@
-import { ReactElement, useCallback, useEffect } from 'react';
+import { ReactElement, useEffect } from 'react';
 import './Home.css';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { fetchNotes, notesSelector } from '../../slices/noteSlice';
+import { fetchNotes, notesSelector, NotesStatus } from '../../slices/noteSlice';
 import { createNotesHandler } from '../../handlers/notesHandler';
 import PreviewGrid from '../../components/Preview/PreviewGrid';
+import DeleteNoteModal from '../../components/DeleteNoteModal';
 
 function Home(): ReactElement {
   const dispatch = useAppDispatch();
@@ -18,6 +19,7 @@ function Home(): ReactElement {
 
   return (
     <div>
+      {status === NotesStatus.Deleting && <DeleteNoteModal />}
       <br />
       <div style={{ position: 'relative' }}>All</div>
       <PreviewGrid notes={allNotes} />

@@ -1,14 +1,14 @@
-import { MouseEventHandler, ReactElement, useEffect, useMemo, useRef, useState } from 'react';
+import { CSSProperties, MouseEventHandler, ReactElement, useEffect, useMemo, useRef, useState } from 'react';
 import { createEditor, Editor, Element, Node, Transforms, Text } from 'slate';
-import { History, withHistory } from 'slate-history';
+import { withHistory } from 'slate-history';
 import { Editable, RenderElementProps, RenderLeafProps, Slate, useSlate, withReact } from 'slate-react';
 import { IdedNotes } from '../../models/notes';
 import { withVerbose } from '../../utils/slate-utils';
 import './Preview.css';
-import { BiBold, BiItalic, BiUnderline } from 'react-icons/bi';
+import { BiBold, BiItalic, BiTrash, BiUnderline } from 'react-icons/bi';
 import { motion, Variants } from 'framer-motion';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { editNotes, notesSelector, NotesStatus, saveNote } from '../../slices/noteSlice';
+import { confirmDeleteNote, editNotes, notesSelector, NotesStatus, saveNote } from '../../slices/noteSlice';
 
 export interface ModalLayout {
   x: number;
@@ -50,11 +50,12 @@ export function PreviewCard({
   const [noteValue, setNoteValue] = useState(note?.descendant);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const { editingId, status } = useAppSelector(notesSelector);
+  const [debId, setDebId] = useState<number>();
 
   useEffect(() => {
     if (status === NotesStatus.Editing && (editingId === note._id || note._id === 'new')) setIsEditing(true);
     else setIsEditing(false);
-  }, [status, editingId]);
+  }, [note._id, status, editingId]);
 
   const onBackgroundClick: MouseEventHandler<HTMLDivElement> = e => {
     console.log('Click Background');
@@ -76,11 +77,22 @@ export function PreviewCard({
     e.stopPropagation();
   };
 
+  const onTrashClick: MouseEventHandler<HTMLDivElement> = e => {
+    dispatch(confirmDeleteNote({ id: note._id }));
+    e.stopPropagation();
+  };
+
   useEffect(() => {
-    if (ref.current) {
-      console.log(`Height Changed!!!`);
-      heightCallback(note._id, ref.current.offsetHeight);
-    }
+    if (debId) clearTimeout(debId);
+    setDebId(
+      window.setTimeout(() => {
+        if (ref.current) {
+          console.log(`Height Changed!!!`);
+          heightCallback(note._id, ref.current.offsetHeight);
+          setDebId(-1);
+        }
+      }, 700),
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref.current?.offsetHeight, note]);
 
@@ -97,19 +109,22 @@ export function PreviewCard({
     },
   };
 
+  const style: CSSProperties = isEditing ? {visibility} : { width, visibility, minWidth: width, maxWidth: width }
+
   return (
     <div className={isEditing ? 'editor-background' : ''} onClick={onBackgroundClick}>
       <motion.div
         ref={ref}
-        className={isEditing ? 'popup-content edit-modal' : 'preview-card'}
+        className={isEditing ? 'edit-modal' : 'preview-card'}
         variants={varients}
-        style={{ width, visibility }}
+        style={style}
         initial='initial'
         animate={isEditing ? 'modal' : 'grid'}
         transition={{ damping: 100 }}
         onClick={onPreviewClick}
       >
         <Slate editor={editor} value={noteValue} onChange={newValue => setNoteValue(newValue)}>
+          {isEditing || <div className='trash' onClick={onTrashClick} children={<BiTrash />} />}
           <Editable className='editor' renderElement={renderElement} renderLeaf={renderLeaf} readOnly={!isEditing} />
           {isEditing && <Toolbar />}
         </Slate>
@@ -121,7 +136,8 @@ export function PreviewCard({
 function renderElement({ attributes, children, element }: RenderElementProps): ReactElement {
   switch (element.type) {
     case 'title':
-      return <h2 {...attributes}>{children}</h2>;
+      //prettier-ignore
+      return <h3 className='editor-title' {...attributes}>{children}</h3>;
     case 'heading-1':
       return <h1 {...attributes}>{children}</h1>;
     case 'heading-2':
@@ -164,9 +180,9 @@ export function withMyPlugins(editor: Editor): Editor {
       for (const [child, childPath] of Node.children(editor, path)) {
         const slateIndex = childPath[0];
         if (Element.isElement(child)) {
-          if (slateIndex === 0 && child.type != 'title') {
+          if (slateIndex === 0 && child.type !== 'title') {
             Transforms.setNodes(editor, { type: 'title' }, { at: childPath });
-          } else if (slateIndex !== 0 && child.type == 'title') {
+          } else if (slateIndex !== 0 && child.type === 'title') {
             Transforms.setNodes(editor, { type: 'paragraph' }, { at: childPath });
           }
         }
@@ -223,7 +239,7 @@ function Toolbar(): ReactElement {
             marks?.[format] ? Editor.removeMark(editor, format) : Editor.addMark(editor, format, true);
           }}
         >
-          {format == 'bold' ? <BiBold /> : format == 'italic' ? <BiItalic /> : <BiUnderline />}
+          {format === 'bold' ? <BiBold /> : format === 'italic' ? <BiItalic /> : <BiUnderline />}
         </div>
       );
     });
