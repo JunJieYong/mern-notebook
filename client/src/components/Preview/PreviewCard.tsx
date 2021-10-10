@@ -1,5 +1,5 @@
 import { MouseEventHandler, ReactElement, useEffect, useMemo, useRef, useState } from 'react';
-import { createEditor, Editor, Element, Node, Transforms } from 'slate';
+import { createEditor, Editor, Element, Node, Transforms, Text } from 'slate';
 import { withHistory } from 'slate-history';
 import { Editable, RenderElementProps, RenderLeafProps, Slate, useSlate, withReact } from 'slate-react';
 import { IdedNotes } from '../../models/notes';
@@ -40,7 +40,7 @@ export function PreviewCard({
 }: CardProps): ReactElement {
   const visibility = visible ? 'visible' : 'hidden';
   const ref = useRef<HTMLDivElement>(null);
-  const editor = useMemo(() => withVerbose(withMyPlugins(withHistory(withReact(createEditor())))), []);
+  const editor = useMemo(() => withMyPlugins(withHistory(withReact(createEditor()))), []);
   const [value, setValue] = useState(note?.descendant);
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
@@ -162,23 +162,64 @@ export function withMyPlugins(editor: Editor): Editor {
 function Toolbar(): ReactElement {
   const editor = useSlate();
   const marks = Editor.marks(editor);
+  const node = Array.from(Editor.nodes(editor, { match: n => !Editor.isEditor(n) && Element.isElement(n) }))[0]?.[0] as
+    | Element
+    | undefined;
+  const [headingExpand, setHeadingExpand] = useState(false);
+  console.log('Toolbar', node);
+
+  const renderHeadingBtn = () => {
+    return new Array(7).fill(undefined).map((v, i) => {
+      const h = i as 0 | 1 | 2 | 3 | 4 | 5 | 6;
+      const active = h === 0 ? !node?.type?.startsWith('heading') : node?.type === `heading-${h}`;
+      return (
+        (headingExpand || active) && (
+          <motion.div
+            layout='position'
+            className={h !== 0 && active ? 'active' : ''}
+            onMouseDown={e => {
+              e.preventDefault();
+              if (!active) {
+                const type = (h === 0 ? 'paragraph' : `heading-${h}`) as Element['type'];
+                Transforms.setNodes(editor, { type });
+              }
+            }}
+          >
+            <span>
+              <strong>{h ? `H${h}` : `P`}</strong>
+            </span>
+          </motion.div>
+        )
+      );
+    });
+  };
+
+  const formats: (keyof Omit<Text, 'text'>)[] = ['bold', 'italic', 'underline'];
+  const renderMarkBtn = (): ReactElement[] =>
+    formats.map((format, i) => {
+      return (
+        <div
+          className={marks?.[format] ? 'active' : ''}
+          onMouseDown={e => {
+            e.preventDefault();
+            marks?.[format] ? Editor.removeMark(editor, format) : Editor.addMark(editor, format, true);
+          }}
+        >
+          {format == 'bold' ? <BiBold /> : format == 'italic' ? <BiItalic /> : <BiUnderline />}
+        </div>
+      );
+    });
 
   return (
-    <div className='editor-toolbar'>
-      <div className={marks?.bold ? 'active' : ''}>
-        <BiBold />
-      </div>
-      <div className={marks?.italic ? 'active' : ''}>
-        <BiItalic />
-      </div>
-      <div className={marks?.underline ? 'active' : ''}>
-        <BiUnderline />
-      </div>
-      <div>
-        <span>
-          <strong>H1</strong>
-        </span>
-      </div>
+    <div
+      className='editor-toolbar'
+      onMouseEnter={() => setHeadingExpand(true)}
+      onMouseLeave={() => setHeadingExpand(false)}
+    >
+      {renderMarkBtn()}
+      <motion.div layout className='headings'>
+        {renderHeadingBtn()}
+      </motion.div>
     </div>
   );
 }
